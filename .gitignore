@@ -1,0 +1,9 @@
+# Python
+__pycache__
+
+# IDE
+.vscode/
+
+# Auth
+credentials.json
+config.py
