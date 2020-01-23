@@ -6,6 +6,8 @@ verify_ssl = true
 [dev-packages]
 pylint = "*"
 flake8 = "*"
+pytest = "*"
+pytest-cov = "*"
 
 [packages]
 python-telegram-bot = "*"
