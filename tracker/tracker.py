@@ -1,5 +1,6 @@
 import logging
 from datetime import date
+from telegram import ParseMode
 from telegram import ReplyKeyboardMarkup
 from telegram import ReplyKeyboardRemove
 from telegram.ext import CommandHandler
@@ -14,11 +15,12 @@ import tracker.config as config
 
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text="I'm the expense tracker bot")
+                             text="Hi! I'm the expense tracker bot")
 
 
 def add(update, _context):
-    update.message.reply_text('Please send a description.',
+    update.message.reply_text('Please send a *description*.',
+                              parse_mode=ParseMode.MARKDOWN,
                               reply_markup=ReplyKeyboardRemove())
     return DESCRIPTION
 
@@ -27,7 +29,8 @@ def description(update, context):
     text = update.message.text
     context.user_data['description'] = text
     logger.info("The description is %s", context.user_data['description'])
-    update.message.reply_text('Please send the location.',
+    update.message.reply_text('Please send the *location*.',
+                              parse_mode=ParseMode.MARKDOWN,
                               reply_markup=ReplyKeyboardRemove())
     return LOCATION
 
@@ -36,7 +39,8 @@ def location(update, context):
     text = update.message.text
     context.user_data['location'] = text
     logger.info("Location of expense: %s", update.message.text)
-    update.message.reply_text('Please send the price.',
+    update.message.reply_text('Please send the *price*.',
+                              parse_mode=ParseMode.MARKDOWN,
                               reply_markup=ReplyKeyboardRemove())
     return PRICE
 
@@ -47,9 +51,10 @@ def price(update, context):
     logger.info("Price of expense: %s", update.message.text)
 
     category_keyboard = [['Comida', 'Entretenimiento']]
-    update.message.reply_text('Please send the category.',
-                              reply_markup=ReplyKeyboardMarkup(category_keyboard, 
-                                                                one_time_keyboard=True))
+    update.message.reply_text('Please send the *category*.',
+                              parse_mode=ParseMode.MARKDOWN,
+                              reply_markup=ReplyKeyboardMarkup(category_keyboard,
+                                                               one_time_keyboard=True))
     return CATEGORY
 
 
