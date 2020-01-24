@@ -21,13 +21,13 @@ class GoogleSheetEditor:
 
     @staticmethod
     def get_sheet(date):
-        return datetime.datetime.strptime(date, '%d-%M-%Y').strftime('%b %y').lower()
+        return date.strftime('%b %y').lower()
 
     def open_worksheet(self, client, sheet):
         return client.open(self.sheet).worksheet(sheet)
 
     def add_expense(self, worksheet, expense):
-        cell = worksheet.find(expense.date)
+        cell = worksheet.find(self.formated_date(expense.date))
         row = cell.row
         range_to_edit = self.cell_range("C" + str(row), "F" + str(row))
         cell_list = worksheet.range(range_to_edit)
@@ -42,6 +42,10 @@ class GoogleSheetEditor:
             expense_values.insert(0, "")
             worksheet.insert_row(expense_values, cell.row + 1)
         print("Added expense for {}".format(expense.date))
+
+    @staticmethod
+    def formated_date(date):
+        return '{dt.day}-{dt.month}-{dt.year}'.format(dt = date)
 
     @staticmethod
     def cell_range(start, end):

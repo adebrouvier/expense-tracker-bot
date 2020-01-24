@@ -74,8 +74,8 @@ def cancel(update, _context):
 
 
 def create_expense(user_data, expense_date):
-    expense = Expense(expense_date.strftime('%d-%M-%Y'), user_data['description'],
-                      user_data['location'], user_data['price'], user_data['category'])
+    expense = Expense(expense_date, user_data['description'], user_data['location'],
+                      user_data['price'], user_data['category'])
     return expense
 
 

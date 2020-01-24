@@ -5,7 +5,7 @@ from tracker.tracker import create_expense
 class TestTracker():
 
     def test_create_expense(self):
-        current_date = date.today()
+        current_date = date(2019, 4, 13)
         user_data = {
             "date": current_date,
             "description": "Latte",
@@ -14,6 +14,7 @@ class TestTracker():
             "category": "Food"
         }
         expense = create_expense(user_data, current_date)
+        assert expense.date == current_date
         assert expense.description == "Latte"
         assert expense.location == "Starbucks"
         assert expense.price == "200"

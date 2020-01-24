@@ -1,9 +1,13 @@
-import unittest
+from datetime import date
 from tracker.google_sheet_editor import GoogleSheetEditor
 
 
-class TestGoogleSheetEditor(unittest.TestCase):
+class TestGoogleSheetEditor():
 
-    def test_range(self):
+    def test_get_sheet(self):
         editor = GoogleSheetEditor("Sheet", "credentials")
-        assert editor.get_sheet('22-1-2020') == 'jan 20'
+        assert editor.get_sheet(date(2020, 1, 13)) == 'jan 20'
+
+    def test_formated_date(self):
+        editor = GoogleSheetEditor("Sheet", "credentials")
+        assert editor.formated_date(date(2020, 1, 13)) == '13-1-2020'
