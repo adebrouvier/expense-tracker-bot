@@ -15,4 +15,4 @@ class Expense:
 
     def __str__(self):
         return 'Expense: {self.description}, {self.location}, {self.price},' \
-            '{self.category}'.format(self=self)
+            ' {self.category}'.format(self=self)

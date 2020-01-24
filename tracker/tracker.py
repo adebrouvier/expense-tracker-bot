@@ -91,7 +91,7 @@ def main():
     dispatcher = updater.dispatcher
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('add', add)],
+        entry_points=[CommandHandler('add', add, Filters.user(user_id=config.user_id))],
 
         states={
             DESCRIPTION: [MessageHandler(Filters.text, description)],
@@ -106,7 +106,7 @@ def main():
         fallbacks=[CommandHandler('cancel', cancel)]
     )
 
-    start_handler = CommandHandler('start', start)
+    start_handler = CommandHandler('start', start, Filters.user(user_id=config.user_id))
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(conv_handler)
     updater.start_polling()
