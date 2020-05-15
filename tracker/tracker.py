@@ -10,6 +10,7 @@ from telegram.ext import MessageHandler
 from telegram.ext import Updater
 from tracker.expense import Expense
 from tracker.google_sheet_editor import GoogleSheetEditor
+import numpy as np
 import tracker.config as config
 
 
@@ -50,7 +51,7 @@ def price(update, context):
     context.user_data['price'] = text
     logger.info("Price of expense: %s", update.message.text)
 
-    category_keyboard = [['Comida', 'Entretenimiento']]
+    category_keyboard = [x.tolist() for x in np.array_split(categories(), 3)]
     update.message.reply_text('Please send the *category*.',
                               parse_mode=ParseMode.MARKDOWN,
                               reply_markup=ReplyKeyboardMarkup(category_keyboard,
@@ -92,6 +93,7 @@ DESCRIPTION, LOCATION, PRICE, CATEGORY = range(4)
 
 
 def main():
+    logger.info("Starting bot...")
     updater = Updater(token=config.bot_token, use_context=True)
     dispatcher = updater.dispatcher
 
@@ -105,7 +107,7 @@ def main():
 
             PRICE: [MessageHandler(Filters.text, price)],
 
-            CATEGORY: [MessageHandler(Filters.regex('^(Comida|Entretenimiento|Otros)$'), category)]
+            CATEGORY: [MessageHandler(Filters.regex('^({})$'.format('|'.join(categories()))), category)]
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
@@ -115,7 +117,7 @@ def main():
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(conv_handler)
     updater.start_polling()
-
+    logger.info("Bot started.")
 
 def add_expense(expense):
     editor = GoogleSheetEditor(config.sheet_name, config.sheets_oauth)
@@ -124,6 +126,8 @@ def add_expense(expense):
     worksheet = editor.open_worksheet(client, sheet)
     editor.add_expense(worksheet, expense)
 
+def categories():
+    return ["Comida", "Entretenimiento", "Electronics/Gadgets", "Transporte", "Ropa", "Inversiones", "Medical", "Otros"]
 
 if __name__ == '__main__':
     main()
