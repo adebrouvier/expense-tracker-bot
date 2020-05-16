@@ -8,9 +8,9 @@ from telegram.ext import ConversationHandler
 from telegram.ext import Filters
 from telegram.ext import MessageHandler
 from telegram.ext import Updater
+import numpy as np
 from tracker.expense import Expense
 from tracker.google_sheet_editor import GoogleSheetEditor
-import numpy as np
 import tracker.config as config
 
 
@@ -107,7 +107,7 @@ def main():
 
             PRICE: [MessageHandler(Filters.text, price)],
 
-            CATEGORY: [MessageHandler(Filters.regex('^({})$'.format('|'.join(categories()))), category)]
+            CATEGORY: [MessageHandler(Filters.regex(categories_regex()), category)]
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
@@ -119,6 +119,7 @@ def main():
     updater.start_polling()
     logger.info("Bot started.")
 
+
 def add_expense(expense):
     editor = GoogleSheetEditor(config.sheet_name, config.sheets_oauth)
     client = editor.authorize()
@@ -126,8 +127,15 @@ def add_expense(expense):
     worksheet = editor.open_worksheet(client, sheet)
     editor.add_expense(worksheet, expense)
 
+
+def categories_regex():
+    return '^({})$'.format('|'.join(categories()))
+
+
 def categories():
-    return ["Comida", "Entretenimiento", "Electronics/Gadgets", "Transporte", "Ropa", "Inversiones", "Medical", "Otros"]
+    return ["Comida", "Entretenimiento", "Electronics/Gadgets", "Transporte", "Ropa", "Inversiones",
+            "Medical", "Otros"]
+
 
 if __name__ == '__main__':
     main()
