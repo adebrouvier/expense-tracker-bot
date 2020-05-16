@@ -1,5 +1,6 @@
 import logging
 from datetime import date
+from telegram import ParseMode
 from telegram import ReplyKeyboardMarkup
 from telegram import ReplyKeyboardRemove
 from telegram.ext import CommandHandler
@@ -7,18 +8,20 @@ from telegram.ext import ConversationHandler
 from telegram.ext import Filters
 from telegram.ext import MessageHandler
 from telegram.ext import Updater
+import numpy as np
 from tracker.expense import Expense
 from tracker.google_sheet_editor import GoogleSheetEditor
-import tracker.config as config
+from tracker.config import Config
 
 
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text="I'm the expense tracker bot")
+                             text="Hi! I'm the expense tracker bot")
 
 
 def add(update, _context):
-    update.message.reply_text('Please send a description.',
+    update.message.reply_text('Please send a *description*.',
+                              parse_mode=ParseMode.MARKDOWN,
                               reply_markup=ReplyKeyboardRemove())
     return DESCRIPTION
 
@@ -27,7 +30,8 @@ def description(update, context):
     text = update.message.text
     context.user_data['description'] = text
     logger.info("The description is %s", context.user_data['description'])
-    update.message.reply_text('Please send the location.',
+    update.message.reply_text('Please send the *location*.',
+                              parse_mode=ParseMode.MARKDOWN,
                               reply_markup=ReplyKeyboardRemove())
     return LOCATION
 
@@ -36,20 +40,22 @@ def location(update, context):
     text = update.message.text
     context.user_data['location'] = text
     logger.info("Location of expense: %s", update.message.text)
-    update.message.reply_text('Please send the price.',
+    update.message.reply_text('Please send the *price*.',
+                              parse_mode=ParseMode.MARKDOWN,
                               reply_markup=ReplyKeyboardRemove())
     return PRICE
 
 
 def price(update, context):
     text = update.message.text
-    context.user_data['price'] = text
+    context.user_data['price'] = int(text)
     logger.info("Price of expense: %s", update.message.text)
 
-    category_keyboard = [['Comida', 'Entretenimiento']]
-    update.message.reply_text('Please send the category.',
-                              reply_markup=ReplyKeyboardMarkup(category_keyboard, 
-                                                                one_time_keyboard=True))
+    category_keyboard = [x.tolist() for x in np.array_split(categories(), 3)]
+    update.message.reply_text('Please send the *category*.',
+                              parse_mode=ParseMode.MARKDOWN,
+                              reply_markup=ReplyKeyboardMarkup(category_keyboard,
+                                                               one_time_keyboard=True))
     return CATEGORY
 
 
@@ -85,8 +91,11 @@ logger = logging.getLogger(__name__)
 
 DESCRIPTION, LOCATION, PRICE, CATEGORY = range(4)
 
+config = Config()
+
 
 def main():
+    logger.info("Starting bot...")
     updater = Updater(token=config.bot_token, use_context=True)
     dispatcher = updater.dispatcher
 
@@ -98,9 +107,9 @@ def main():
 
             LOCATION: [MessageHandler(Filters.text, location)],
 
-            PRICE: [MessageHandler(Filters.text, price)],
+            PRICE: [MessageHandler(Filters.regex(r'\d+'), price)],
 
-            CATEGORY: [MessageHandler(Filters.regex('^(Comida|Entretenimiento|Otros)$'), category)]
+            CATEGORY: [MessageHandler(Filters.regex(categories_regex()), category)]
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
@@ -110,6 +119,7 @@ def main():
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(conv_handler)
     updater.start_polling()
+    logger.info("Bot started.")
 
 
 def add_expense(expense):
@@ -118,6 +128,15 @@ def add_expense(expense):
     sheet = editor.get_sheet(expense.date)
     worksheet = editor.open_worksheet(client, sheet)
     editor.add_expense(worksheet, expense)
+
+
+def categories_regex():
+    return '^({})$'.format('|'.join(categories()))
+
+
+def categories():
+    return ["Comida", "Entretenimiento", "Electronics/Gadgets", "Transporte", "Ropa", "Inversiones",
+            "Medical", "Otros"]
 
 
 if __name__ == '__main__':

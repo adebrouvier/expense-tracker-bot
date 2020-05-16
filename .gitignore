@@ -7,4 +7,6 @@ __pycache__
 # Auth
 credentials.json
 TheExpenseTrackerBot-*.json
-config.py
+
+# Environment variables
+.env

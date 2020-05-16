@@ -1,4 +1,3 @@
-import datetime
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
 
@@ -45,7 +44,7 @@ class GoogleSheetEditor:
 
     @staticmethod
     def formated_date(date):
-        return '{dt.day}-{dt.month}-{dt.year}'.format(dt = date)
+        return '{dt.day}-{dt.month}-{dt.year}'.format(dt=date)
 
     @staticmethod
     def cell_range(start, end):
