@@ -11,7 +11,7 @@ from telegram.ext import Updater
 import numpy as np
 from tracker.expense import Expense
 from tracker.google_sheet_editor import GoogleSheetEditor
-import tracker.config as config
+from tracker.config import Config
 
 
 def start(update, context):
@@ -48,7 +48,7 @@ def location(update, context):
 
 def price(update, context):
     text = update.message.text
-    context.user_data['price'] = text
+    context.user_data['price'] = int(text)
     logger.info("Price of expense: %s", update.message.text)
 
     category_keyboard = [x.tolist() for x in np.array_split(categories(), 3)]
@@ -90,6 +90,8 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 DESCRIPTION, LOCATION, PRICE, CATEGORY = range(4)
+
+config = Config()
 
 
 def main():

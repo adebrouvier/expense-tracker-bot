@@ -1,4 +1,0 @@
-bot_token = 'token'
-sheet_name = 'sheet'
-sheets_oauth = 'credentials.json'
-user_id = 1
