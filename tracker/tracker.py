@@ -98,8 +98,25 @@ def main():
     logger.info("Starting bot...")
     updater = Updater(token=config.bot_token, use_context=True)
     dispatcher = updater.dispatcher
+    start_handler = CommandHandler('start', start, Filters.user(user_id=config.user_id))
+    dispatcher.add_handler(start_handler)
+    dispatcher.add_handler(conversation_handler())
+    if config.development:
+        logger.info("Starting in development mode")
+        updater.start_polling()
+    else:
+        logger.info("Starting in production mode")
+        updater.start_webhook(listen="0.0.0.0",
+                              port=config.port,
+                              url_path=config.bot_token)
+        webhook_url = "https://{}.herokuapp.com/{}".format(config.app_name, config.bot_token)
+        updater.bot.set_webhook(webhook_url)
+        updater.idle()
+    logger.info("Bot started.")
 
-    conv_handler = ConversationHandler(
+
+def conversation_handler():
+    return ConversationHandler(
         entry_points=[CommandHandler('add', add, Filters.user(user_id=config.user_id))],
 
         states={
@@ -115,16 +132,13 @@ def main():
         fallbacks=[CommandHandler('cancel', cancel)]
     )
 
-    start_handler = CommandHandler('start', start, Filters.user(user_id=config.user_id))
-    dispatcher.add_handler(start_handler)
-    dispatcher.add_handler(conv_handler)
-    updater.start_polling()
-    logger.info("Bot started.")
-
 
 def add_expense(expense):
     editor = GoogleSheetEditor(config.spreadsheet_name, config.sheets_oauth)
-    client = editor.authorize()
+    if (config.development):
+        client = editor.authorize_with_file()
+    else:
+        client = editor.authorize_with_env_variable('GDRIVE_API_CREDENTIALS')
     worksheet_title = editor.get_worksheet_name(expense.date)
     worksheet = editor.open_worksheet(client, worksheet_title)
     editor.add_expense(worksheet, expense)

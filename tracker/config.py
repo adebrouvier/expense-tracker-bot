@@ -10,3 +10,6 @@ class Config:
         self.spreadsheet_name = os.getenv("SPREADSHEET_NAME")
         self.sheets_oauth = os.getenv("SHEETS_OAUTH")
         self.user_id = int(os.getenv("USER_ID"))
+        self.development = bool(os.getenv("DEVELOPMENT", True))
+        self.port = int(os.getenv("PORT", 8443))
+        self.app_name = os.getenv("APP_NAME")
