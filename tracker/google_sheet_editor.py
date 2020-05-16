@@ -32,7 +32,7 @@ class GoogleSheetEditor:
         else:
             expense_values.insert(0, "")
             expense_values.insert(0, "")
-            worksheet.insert_rows(cell.row + 1, number=1, values=expense_values)
+            worksheet.insert_rows(cell.row, number=1, values=expense_values)
         print("Added expense for {}".format(expense.date))
 
     @staticmethod
