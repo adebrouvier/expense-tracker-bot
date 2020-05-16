@@ -18,6 +18,7 @@ gspread = "*"
 oauth2client = "*"
 numpy = "*"
 python-dotenv = "*"
+pygsheets = "*"
 
 [requires]
 python_version = "3.6"
