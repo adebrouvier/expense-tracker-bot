@@ -123,10 +123,10 @@ def main():
 
 
 def add_expense(expense):
-    editor = GoogleSheetEditor(config.sheet_name, config.sheets_oauth)
+    editor = GoogleSheetEditor(config.spreadsheet_name, config.sheets_oauth)
     client = editor.authorize()
-    sheet = editor.get_sheet(expense.date)
-    worksheet = editor.open_worksheet(client, sheet)
+    worksheet_title = editor.get_worksheet_name(expense.date)
+    worksheet = editor.open_worksheet(client, worksheet_title)
     editor.add_expense(worksheet, expense)
 
 

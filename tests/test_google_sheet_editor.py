@@ -4,9 +4,9 @@ from tracker.google_sheet_editor import GoogleSheetEditor
 
 class TestGoogleSheetEditor():
 
-    def test_get_sheet(self):
+    def test_get_sheet_name(self):
         editor = GoogleSheetEditor("Sheet", "credentials")
-        assert editor.get_sheet(date(2020, 1, 13)) == 'jan 20'
+        assert editor.get_worksheet_name(date(2020, 1, 13)) == 'jan 20'
 
     def test_formated_date(self):
         editor = GoogleSheetEditor("Sheet", "credentials")
