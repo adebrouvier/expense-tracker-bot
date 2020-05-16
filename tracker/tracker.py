@@ -107,7 +107,7 @@ def main():
 
             LOCATION: [MessageHandler(Filters.text, location)],
 
-            PRICE: [MessageHandler(Filters.text, price)],
+            PRICE: [MessageHandler(Filters.regex(r'\d+'), price)],
 
             CATEGORY: [MessageHandler(Filters.regex(categories_regex()), category)]
         },
