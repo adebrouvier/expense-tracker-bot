@@ -17,6 +17,7 @@ google-auth-oauthlib = "*"
 gspread = "*"
 oauth2client = "*"
 numpy = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.6"
