@@ -7,7 +7,7 @@ pipenv install
 ```
 
 ## Run
-In order to run the bot, you should create a configuration file under `tracker/config.py`, based on `tracker/config.py.example`.
+In order to run the bot, you should create a `.env` file, based on `.env.example`.
 
 To run the bot execute:
 
