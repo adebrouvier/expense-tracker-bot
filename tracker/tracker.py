@@ -135,7 +135,7 @@ def conversation_handler():
 
 def add_expense(expense):
     editor = GoogleSheetEditor(config.spreadsheet_name, config.sheets_oauth)
-    if (config.development):
+    if config.development:
         client = editor.authorize_with_file()
     else:
         client = editor.authorize_with_env_variable('GDRIVE_API_CREDENTIALS')
