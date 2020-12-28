@@ -13,3 +13,4 @@ class Config:
         self.development = os.getenv("DEVELOPMENT") == 'True'
         self.port = int(os.getenv("PORT", "8443"))
         self.app_name = os.getenv("APP_NAME")
+        self.sentry_dsn = os.getenv("SENTRY_DSN")

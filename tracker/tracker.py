@@ -9,6 +9,7 @@ from telegram.ext import Filters
 from telegram.ext import MessageHandler
 from telegram.ext import Updater
 import numpy as np
+import sentry_sdk
 from tracker.expense import Expense
 from tracker.google_sheet_editor import GoogleSheetEditor
 from tracker.config import Config
@@ -92,6 +93,11 @@ logger = logging.getLogger(__name__)
 DESCRIPTION, LOCATION, PRICE, CATEGORY = range(4)
 
 config = Config()
+
+sentry_sdk.init(
+    config.sentry_dsn,
+    traces_sample_rate=1.0
+)
 
 
 def main():
