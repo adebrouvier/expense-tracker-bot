@@ -67,7 +67,7 @@ def category(update, context):
 
     expense = create_expense(context.user_data, date.today())
     add_expense(expense)
-    update.message.reply_text('Adding expense {}'.format(str(expense)))
+    update.message.reply_text('Expense added: {}'.format(str(expense)))
     return ConversationHandler.END
 
 
