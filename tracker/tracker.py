@@ -8,6 +8,7 @@ from telegram.ext import ConversationHandler
 from telegram.ext import Filters
 from telegram.ext import MessageHandler
 from telegram.ext import Updater
+from sentry_sdk import capture_exception
 import numpy as np
 import sentry_sdk
 from tracker.expense import Expense
@@ -66,8 +67,13 @@ def category(update, context):
     context.user_data['category'] = text
 
     expense = create_expense(context.user_data, date.today())
-    add_expense(expense)
-    update.message.reply_text('Expense added: {}'.format(str(expense)))
+    try:
+        add_expense(expense)
+        update.message.reply_text('Expense added: {}'.format(str(expense)))
+    except Exception as error:
+        update.message.reply_text('There was an error while adding the expense.')
+        capture_exception(error)
+
     return ConversationHandler.END
 
 
