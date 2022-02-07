@@ -121,11 +121,11 @@ def main():
         updater.start_polling()
     else:
         logger.info("Starting in production mode")
+        webhook_url = "https://{}.herokuapp.com/{}".format(config.app_name, config.bot_token)
         updater.start_webhook(listen="0.0.0.0",
                               port=config.port,
-                              url_path=config.bot_token)
-        webhook_url = "https://{}.herokuapp.com/{}".format(config.app_name, config.bot_token)
-        updater.bot.set_webhook(webhook_url)
+                              url_path=config.bot_token,
+                              webhook_url=webhook_url)
         updater.idle()
     logger.info("Bot started.")
 
