@@ -10,6 +10,7 @@ from telegram.ext import MessageHandler
 from telegram.ext import Updater
 from sentry_sdk import capture_exception
 from pygsheets.spreadsheet import WorksheetNotFound
+from pygsheets.exceptions import SpreadsheetNotFound
 import numpy as np
 import sentry_sdk
 from tracker.expense import Expense
@@ -71,8 +72,10 @@ def category(update, context):
     try:
         add_expense(expense)
         update.message.reply_text('Expense added: {}'.format(str(expense)))
-    except WorksheetNotFound:
+    except SpreadsheetNotFound:
         update.message.reply_text('Spreadsheet not found. Please update config variable.')
+    except WorksheetNotFound:
+        update.message.reply_text('Worksheet not found. Check if spreadsheet has worksheet for curent month and year.')
     except Exception as error:
         update.message.reply_text('There was an error while adding the expense.')
         capture_exception(error)
