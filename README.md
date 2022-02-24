@@ -16,7 +16,7 @@ In order to run the bot, you should create a `.env` file, based on `.env.example
 To run the bot execute:
 
 ```
-python3 -m tracker.tracker
+pipenv run python3 -m tracker.bot
 ```
 
 ## Development

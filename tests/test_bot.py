@@ -1,5 +1,5 @@
 from datetime import date
-from tracker.tracker import create_expense
+from tracker.bot import create_expense
 
 
 class TestTracker():

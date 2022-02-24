@@ -13,9 +13,11 @@ from pygsheets.spreadsheet import WorksheetNotFound
 from pygsheets.exceptions import SpreadsheetNotFound
 import numpy as np
 import sentry_sdk
+from tracker import expense
 from tracker.expense import Expense
-from tracker.google_sheet_editor import GoogleSheetEditor
+from tracker.expense_tracker import ExpenseTracker
 from tracker.config import Config
+from tracker.google_sheet_editor import GoogleSheetEditor
 
 
 def start(update, context):
@@ -55,7 +57,7 @@ def price(update, context):
     context.user_data['price'] = int(text)
     logger.info("Price of expense: %s", update.message.text)
 
-    category_keyboard = [x.tolist() for x in np.array_split(categories(), 3)]
+    category_keyboard = [x.tolist() for x in np.array_split(expense_tracker.get_categories(), 3)]
     update.message.reply_text('Please send the *category*.',
                               parse_mode=ParseMode.MARKDOWN,
                               reply_markup=ReplyKeyboardMarkup(category_keyboard,
@@ -70,7 +72,7 @@ def category(update, context):
 
     expense = create_expense(context.user_data, date.today())
     try:
-        add_expense(expense)
+        expense_tracker.add_expense(expense)
         update.message.reply_text('Expense added: {}'.format(str(expense)))
     except SpreadsheetNotFound:
         update.message.reply_text('Spreadsheet not found. Please update config variable.')
@@ -108,8 +110,16 @@ config = Config()
 
 sentry_sdk.init(
     config.sentry_dsn,
-    traces_sample_rate=1.0
+    traces_sample_rate=1.0,
+    environment='production' if not config.development else 'development',
 )
+
+editor = GoogleSheetEditor(config.spreadsheet_name, config.sheets_oauth)
+if config.development:
+    editor.authorize_with_file()
+else:
+    editor.authorize_with_env_variable('GDRIVE_API_CREDENTIALS')
+expense_tracker = ExpenseTracker(editor)
 
 
 def main():
@@ -144,31 +154,16 @@ def conversation_handler():
 
             PRICE: [MessageHandler(Filters.regex(r'\d+'), price)],
 
-            CATEGORY: [MessageHandler(Filters.regex(categories_regex()), category)]
+            CATEGORY: [MessageHandler(Filters.regex(categories_regex(expense_tracker)), category)]
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
     )
 
 
-def add_expense(expense):
-    editor = GoogleSheetEditor(config.spreadsheet_name, config.sheets_oauth)
-    if config.development:
-        client = editor.authorize_with_file()
-    else:
-        client = editor.authorize_with_env_variable('GDRIVE_API_CREDENTIALS')
-    worksheet_title = editor.get_worksheet_name(expense.date)
-    worksheet = editor.open_worksheet(client, worksheet_title)
-    editor.add_expense(worksheet, expense)
 
-
-def categories_regex():
-    return '^({})$'.format('|'.join(categories()))
-
-
-def categories():
-    return ["Comida", "Entretenimiento", "Electronics/Gadgets", "Transporte", "Ropa", "Inversiones",
-            "Medical", "Otros"]
+def categories_regex(expense_tracker):
+    return '^({})$'.format('|'.join(expense_tracker.get_categories()))
 
 
 if __name__ == '__main__':

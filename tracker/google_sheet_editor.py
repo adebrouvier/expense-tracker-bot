@@ -9,19 +9,17 @@ class GoogleSheetEditor:
         self.credentials_path = credentials_path
 
     def authorize_with_file(self):
-        client = pygsheets.authorize(service_file=self.credentials_path)
-        return client
+        self.client = pygsheets.authorize(service_file=self.credentials_path)
 
     def authorize_with_env_variable(self, env_var):
-        client = pygsheets.authorize(service_account_env_var=env_var)
-        return client
+        self.client = pygsheets.authorize(service_account_env_var=env_var)
 
     @staticmethod
     def get_worksheet_name(date):
         return date.strftime('%b %y').lower()
 
-    def open_worksheet(self, client, worksheet_title):
-        return client.open(self.spreadsheet).worksheet_by_title(worksheet_title)
+    def open_worksheet(self, worksheet_title):
+        return self.client.open(self.spreadsheet).worksheet_by_title(worksheet_title)
 
     def add_expense(self, worksheet, expense):
         cell = worksheet.find(self.formated_date(expense.date))[0]
