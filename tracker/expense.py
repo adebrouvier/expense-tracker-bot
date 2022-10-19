@@ -13,6 +13,10 @@ class Expense:
     def to_values(self):
         return [self.description, self.location, self.price, self.category]
 
+    def to_markdown(self):
+        return '❗ *Description*: {}\n📍 *Location*: {}\n💰 *Price*: ${}\n🏷 *Category*: {}' \
+               .format(self.description, self.location, self.price, self.category)
+
     def __str__(self):
         return 'Expense: {self.description}, {self.location}, {self.price},' \
             ' {self.category}'.format(self=self)

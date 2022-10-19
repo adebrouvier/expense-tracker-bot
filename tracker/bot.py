@@ -26,8 +26,8 @@ def start(update, context):
 
 
 def add(update, _context):
-    update.message.reply_text('Please send a *description*.',
-                              parse_mode=ParseMode.MARKDOWN,
+    update.message.reply_text('Please send a *description*\.',
+                              parse_mode=ParseMode.MARKDOWN_V2,
                               reply_markup=ReplyKeyboardRemove())
     return DESCRIPTION
 
@@ -36,8 +36,8 @@ def description(update, context):
     text = update.message.text
     context.user_data['description'] = text
     logger.info("The description is %s", context.user_data['description'])
-    update.message.reply_text('Please send the *location*.',
-                              parse_mode=ParseMode.MARKDOWN,
+    update.message.reply_text('Please send the *location*\.',
+                              parse_mode=ParseMode.MARKDOWN_V2,
                               reply_markup=ReplyKeyboardRemove())
     return LOCATION
 
@@ -46,8 +46,8 @@ def location(update, context):
     text = update.message.text
     context.user_data['location'] = text
     logger.info("Location of expense: %s", update.message.text)
-    update.message.reply_text('Please send the *price*.',
-                              parse_mode=ParseMode.MARKDOWN,
+    update.message.reply_text('Please send the *price*\.',
+                              parse_mode=ParseMode.MARKDOWN_V2,
                               reply_markup=ReplyKeyboardRemove())
     return PRICE
 
@@ -58,8 +58,8 @@ def price(update, context):
     logger.info("Price of expense: %s", update.message.text)
 
     category_keyboard = [x.tolist() for x in np.array_split(expense_tracker.get_categories(), 3)]
-    update.message.reply_text('Please send the *category*.',
-                              parse_mode=ParseMode.MARKDOWN,
+    update.message.reply_text('Please send the *category*\.',
+                              parse_mode=ParseMode.MARKDOWN_V2,
                               reply_markup=ReplyKeyboardMarkup(category_keyboard,
                                                                one_time_keyboard=True))
     return CATEGORY
@@ -73,13 +73,15 @@ def category(update, context):
     expense = create_expense(context.user_data, date.today())
     try:
         expense_tracker.add_expense(expense)
-        update.message.reply_text('Expense added: {}'.format(str(expense)))
+        update.message.reply_text('Expense added ✅ \n\n{}'.format(expense.to_markdown()),
+                                  parse_mode=ParseMode.MARKDOWN_V2)
     except SpreadsheetNotFound:
         update.message.reply_text('Spreadsheet not found. Please update config variable.')
     except WorksheetNotFound:
         update.message.reply_text('Worksheet not found. Check if spreadsheet has worksheet for curent month and year.')
     except Exception as error:
         update.message.reply_text('There was an error while adding the expense.')
+        logger.error(error)
         capture_exception(error)
 
     return ConversationHandler.END
