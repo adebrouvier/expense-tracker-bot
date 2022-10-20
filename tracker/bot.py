@@ -1,5 +1,6 @@
 import logging
 from datetime import date
+from datetime import datetime
 from telegram import ParseMode
 from telegram import ReplyKeyboardMarkup
 from telegram import ReplyKeyboardRemove
@@ -25,7 +26,19 @@ def start(update, context):
                              text="Hi! I'm the expense tracker bot")
 
 
-def add(update, _context):
+def add(update, context):
+    raw_date = " ".join(context.args)
+
+    if not raw_date.strip():
+            context.user_data['expense_date'] = date.today()
+    else:
+        try:
+            parsed_date = datetime.strptime(raw_date, '%d/%m/%Y')
+            context.user_data['expense_date'] = parsed_date
+        except ValueError:
+            update.message.reply_text("Invalid date provided. Expected format: dd/mm/yyyy")
+            return ConversationHandler.END
+
     update.message.reply_text('Please send a *description*\.',
                               parse_mode=ParseMode.MARKDOWN_V2,
                               reply_markup=ReplyKeyboardRemove())
@@ -70,10 +83,10 @@ def category(update, context):
     logger.info("Category of expense: %s", update.message.text)
     context.user_data['category'] = text
 
-    expense = create_expense(context.user_data, date.today())
+    expense = create_expense(context.user_data)
     try:
         expense_tracker.add_expense(expense)
-        update.message.reply_text('Expense added ✅ \n\n{}'.format(expense.to_markdown()),
+        update.message.reply_text('Expense added ✅\n{}'.format(expense.to_markdown()),
                                   parse_mode=ParseMode.MARKDOWN_V2)
     except SpreadsheetNotFound:
         update.message.reply_text('Spreadsheet not found. Please update config variable.')
@@ -96,8 +109,8 @@ def cancel(update, _context):
     return ConversationHandler.END
 
 
-def create_expense(user_data, expense_date):
-    expense = Expense(expense_date, user_data['description'], user_data['location'],
+def create_expense(user_data):
+    expense = Expense(user_data['expense_date'], user_data['description'], user_data['location'],
                       user_data['price'], user_data['category'])
     return expense
 

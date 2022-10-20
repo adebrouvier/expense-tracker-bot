@@ -1,3 +1,5 @@
+from telegram.utils.helpers import escape_markdown
+
 class Expense:
     """Expense
 
@@ -14,8 +16,8 @@ class Expense:
         return [self.description, self.location, self.price, self.category]
 
     def to_markdown(self):
-        return '❗ *Description*: {}\n📍 *Location*: {}\n💰 *Price*: ${}\n🏷 *Category*: {}' \
-               .format(self.description, self.location, self.price, self.category)
+        return '❗ *Description*: {}\n📍 *Location*: {}\n💰 *Price*: ${}\n🏷 *Category*: {}\n📅 *Date*: {}' \
+               .format(self.description, self.location, self.price, self.category, escape_markdown(text=str(self.date), version=2))
 
     def __str__(self):
         return 'Expense: {self.description}, {self.location}, {self.price},' \
