@@ -91,7 +91,7 @@ def category(update, context):
     except SpreadsheetNotFound:
         update.message.reply_text('Spreadsheet not found. Please update config variable.')
     except WorksheetNotFound:
-        update.message.reply_text('Worksheet not found. Check if spreadsheet has worksheet for curent month and year.')
+        update.message.reply_text('Worksheet not found. Check if spreadsheet has worksheet for current month and year.')
     except Exception as error:
         update.message.reply_text('There was an error while adding the expense.')
         logger.error(error)
@@ -149,11 +149,12 @@ def main():
         updater.start_polling()
     else:
         logger.info("Starting in production mode")
-        webhook_url = "https://{}.herokuapp.com/{}".format(config.app_name, config.bot_token)
+        webhook_url = "{}/{}".format(config.app_url, config.bot_token)
         updater.start_webhook(listen="0.0.0.0",
                               port=config.port,
                               url_path=config.bot_token,
                               webhook_url=webhook_url)
+        logger.info("Started webhook in app {}".format(config.app_url))
         updater.idle()
     logger.info("Bot started.")
 

@@ -12,5 +12,5 @@ class Config:
         self.user_id = int(os.getenv("USER_ID"))
         self.development = os.getenv("DEVELOPMENT") == 'True'
         self.port = int(os.getenv("PORT", "8443"))
-        self.app_name = os.getenv("APP_NAME")
+        self.app_url = os.getenv("APP_URL")
         self.sentry_dsn = os.getenv("SENTRY_DSN")
