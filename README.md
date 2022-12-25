@@ -2,7 +2,7 @@
 A Telegram bot for tracking expenses with Google Sheets. Spreadsheet based on [this](https://docs.google.com/spreadsheets/d/1wo38fQVJNay8VoVySq4f3qyKe944MfoSOYDRIra1l-k/edit#gid=396764253) template.
 
 ## Requirements
-* Python 3.6
+* Python 3.10
 * Pipenv
 
 ## Build
