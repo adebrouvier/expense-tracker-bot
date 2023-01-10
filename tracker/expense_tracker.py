@@ -1,6 +1,3 @@
-from tracker.google_sheet_editor import GoogleSheetEditor
-
-
 class ExpenseTracker:
 
     def __init__(self, editor):
@@ -19,4 +16,4 @@ class ExpenseTracker:
             include_tailing_empty=False,
             include_tailing_empty_rows=False,
         )
-        return [row[0] for row in categories_matrix] # Extract column from matrix
+        return [row[0] for row in categories_matrix]  # Extract column from matrix
