@@ -14,7 +14,6 @@ from pygsheets.spreadsheet import WorksheetNotFound
 from pygsheets.exceptions import SpreadsheetNotFound
 import numpy as np
 import sentry_sdk
-from tracker import expense
 from tracker.expense import Expense
 from tracker.expense_tracker import ExpenseTracker
 from tracker.config import Config
@@ -30,7 +29,7 @@ def add(update, context):
     raw_date = " ".join(context.args)
 
     if not raw_date.strip():
-            context.user_data['expense_date'] = date.today()
+        context.user_data['expense_date'] = date.today()
     else:
         try:
             parsed_date = datetime.strptime(raw_date, '%d/%m/%Y')
@@ -168,7 +167,7 @@ def conversation_handler():
 
             LOCATION: [MessageHandler(Filters.text, location)],
 
-            PRICE: [MessageHandler(Filters.regex(r'\d+'), price)],
+            PRICE: [MessageHandler(Filters.regex(price_regex()), price)],
 
             CATEGORY: [MessageHandler(Filters.regex(categories_regex(expense_tracker)), category)]
         },
@@ -176,6 +175,9 @@ def conversation_handler():
         fallbacks=[CommandHandler('cancel', cancel)]
     )
 
+
+def price_regex():
+    return r'^[0-9]+$'
 
 
 def categories_regex(expense_tracker):

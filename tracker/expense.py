@@ -1,5 +1,6 @@
 from telegram.utils.helpers import escape_markdown
 
+
 class Expense:
     """Expense
 

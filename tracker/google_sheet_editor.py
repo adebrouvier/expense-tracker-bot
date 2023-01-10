@@ -9,7 +9,7 @@ class GoogleSheetEditor:
         self.credentials_path = credentials_path
 
     def authorize_with_file(self):
-        self.client = pygsheets.authorize(service_file=self.credentials_path)
+        self.client = pygsheets.authorize(service_account_file=self.credentials_path)
 
     def authorize_with_env_variable(self, env_var):
         self.client = pygsheets.authorize(service_account_env_var=env_var)
