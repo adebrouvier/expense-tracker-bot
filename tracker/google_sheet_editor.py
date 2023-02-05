@@ -7,6 +7,7 @@ class GoogleSheetEditor:
     def __init__(self, spreadsheet, credentials_path):
         self.spreadsheet = spreadsheet
         self.credentials_path = credentials_path
+        self.client = None
 
     def authorize_with_file(self):
         self.client = pygsheets.authorize(service_account_file=self.credentials_path)

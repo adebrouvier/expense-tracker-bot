@@ -38,9 +38,7 @@ def add(update, context):
             update.message.reply_text("Invalid date provided. Expected format: dd/mm/yyyy")
             return ConversationHandler.END
 
-    update.message.reply_text('Please send a *description*\.',
-                              parse_mode=ParseMode.MARKDOWN_V2,
-                              reply_markup=ReplyKeyboardRemove())
+    reply_message(update, 'Please send a *description*\\.', ReplyKeyboardRemove())
     return DESCRIPTION
 
 
@@ -48,9 +46,7 @@ def description(update, context):
     text = update.message.text
     context.user_data['description'] = text
     logger.info("The description is %s", context.user_data['description'])
-    update.message.reply_text('Please send the *location*\.',
-                              parse_mode=ParseMode.MARKDOWN_V2,
-                              reply_markup=ReplyKeyboardRemove())
+    reply_message(update, 'Please send the *location*\\.', ReplyKeyboardRemove())
     return LOCATION
 
 
@@ -58,9 +54,7 @@ def location(update, context):
     text = update.message.text
     context.user_data['location'] = text
     logger.info("Location of expense: %s", update.message.text)
-    update.message.reply_text('Please send the *price*\.',
-                              parse_mode=ParseMode.MARKDOWN_V2,
-                              reply_markup=ReplyKeyboardRemove())
+    reply_message(update, 'Please send the *price*\\.', ReplyKeyboardRemove())
     return PRICE
 
 
@@ -70,10 +64,8 @@ def price(update, context):
     logger.info("Price of expense: %s", update.message.text)
 
     category_keyboard = [x.tolist() for x in np.array_split(expense_tracker.get_categories(), 3)]
-    update.message.reply_text('Please send the *category*\.',
-                              parse_mode=ParseMode.MARKDOWN_V2,
-                              reply_markup=ReplyKeyboardMarkup(category_keyboard,
-                                                               one_time_keyboard=True))
+    reply_message(update, 'Please send the *category*\\.',
+                  ReplyKeyboardMarkup(category_keyboard, one_time_keyboard=True))
     return CATEGORY
 
 
@@ -90,8 +82,9 @@ def category(update, context):
     except SpreadsheetNotFound:
         update.message.reply_text('Spreadsheet not found. Please update config variable.')
     except WorksheetNotFound:
-        update.message.reply_text('Worksheet not found. Check if spreadsheet has worksheet for current month and year.')
-    except Exception as error:
+        msg = 'Worksheet not found. Check if spreadsheet has worksheet for current month and year.'
+        update.message.reply_text(msg)
+    except Exception as error:  # pylint: disable=broad-except
         update.message.reply_text('There was an error while adding the expense.')
         logger.error(error)
         capture_exception(error)
@@ -112,6 +105,12 @@ def create_expense(user_data):
     expense = Expense(user_data['expense_date'], user_data['description'], user_data['location'],
                       user_data['price'], user_data['category'])
     return expense
+
+
+def reply_message(update, text, reply_markup):
+    update.message.reply_text(text,
+                              parse_mode=ParseMode.MARKDOWN_V2,
+                              reply_markup=reply_markup)
 
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -153,7 +152,7 @@ def main():
                               port=config.port,
                               url_path=config.bot_token,
                               webhook_url=webhook_url)
-        logger.info("Started webhook in app {}".format(config.app_url))
+        logger.info("Started webhook in app %s", config.app_url)
         updater.idle()
     logger.info("Bot started.")
 
@@ -180,8 +179,8 @@ def price_regex():
     return r'^[0-9]+$'
 
 
-def categories_regex(expense_tracker):
-    return '^({})$'.format('|'.join(expense_tracker.get_categories()))
+def categories_regex(tracker):
+    return '^({})$'.format('|'.join(tracker.get_categories()))
 
 
 if __name__ == '__main__':
