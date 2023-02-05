@@ -4,6 +4,7 @@ from datetime import datetime
 from telegram import ParseMode
 from telegram import ReplyKeyboardMarkup
 from telegram import ReplyKeyboardRemove
+from telegram import Update
 from telegram.ext import CommandHandler
 from telegram.ext import ConversationHandler
 from telegram.ext import Filters
@@ -20,12 +21,12 @@ from tracker.config import Config
 from tracker.google_sheet_editor import GoogleSheetEditor
 
 
-def start(update, context):
+def start(update: Update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text="Hi! I'm the expense tracker bot")
 
 
-def add(update, context):
+def add(update: Update, context):
     raw_date = " ".join(context.args)
 
     if not raw_date.strip():
@@ -42,7 +43,7 @@ def add(update, context):
     return DESCRIPTION
 
 
-def description(update, context):
+def description(update: Update, context):
     text = update.message.text
     context.user_data['description'] = text
     logger.info("The description is %s", context.user_data['description'])
@@ -50,7 +51,7 @@ def description(update, context):
     return LOCATION
 
 
-def location(update, context):
+def location(update: Update, context):
     text = update.message.text
     context.user_data['location'] = text
     logger.info("Location of expense: %s", update.message.text)
@@ -58,7 +59,7 @@ def location(update, context):
     return PRICE
 
 
-def price(update, context):
+def price(update: Update, context):
     text = update.message.text
     context.user_data['price'] = int(text)
     logger.info("Price of expense: %s", update.message.text)
@@ -69,7 +70,7 @@ def price(update, context):
     return CATEGORY
 
 
-def category(update, context):
+def category(update: Update, context):
     text = update.message.text
     logger.info("Category of expense: %s", update.message.text)
     context.user_data['category'] = text
@@ -92,22 +93,27 @@ def category(update, context):
     return ConversationHandler.END
 
 
-def cancel(update, _context):
+def cancel(update: Update, _context):
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
-    update.message.reply_text('Expense canceled',
-                              reply_markup=ReplyKeyboardRemove())
-
+    reply_message(update, 'Expense canceled', reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
 
-def create_expense(user_data):
+def last_expenses(update: Update, _context):
+    number_of_expenses = 5
+    last_expenses = expense_tracker.last_expenses(number_of_expenses)
+    reply_message(update, 'Last {} expenses\n{}'.format(number_of_expenses, '\n\n'.join(last_expenses)))
+    return ConversationHandler.END
+
+
+def create_expense(user_data) -> Expense:
     expense = Expense(user_data['expense_date'], user_data['description'], user_data['location'],
                       user_data['price'], user_data['category'])
     return expense
 
 
-def reply_message(update, text, reply_markup):
+def reply_message(update: Update, text, reply_markup=None):
     update.message.reply_text(text,
                               parse_mode=ParseMode.MARKDOWN_V2,
                               reply_markup=reply_markup)
@@ -159,7 +165,10 @@ def main():
 
 def conversation_handler():
     return ConversationHandler(
-        entry_points=[CommandHandler('add', add, Filters.user(user_id=config.user_id))],
+        entry_points=[
+            CommandHandler('add', add, Filters.user(user_id=config.user_id)),
+            CommandHandler('last', last_expenses, Filters.user(user_id=config.user_id))
+        ],
 
         states={
             DESCRIPTION: [MessageHandler(Filters.text, description)],

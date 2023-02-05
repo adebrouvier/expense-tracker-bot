@@ -1,3 +1,4 @@
+from datetime import date
 from telegram.utils.helpers import escape_markdown
 
 
@@ -6,8 +7,8 @@ class Expense:
 
     """
 
-    def __init__(self, date, description, location, price, category):
-        self.date = date
+    def __init__(self, spent_at: date, description: str, location: str, price: str, category: str):
+        self.spent_at = spent_at
         self.description = description
         self.location = location
         self.price = price
@@ -18,7 +19,12 @@ class Expense:
 
     def to_markdown(self):
         return '❗ *Description*: {}\n📍 *Location*: {}\n💰 *Price*: ${}\n🏷 *Category*: {}\n📅 *Date*: {}' \
-               .format(self.description, self.location, self.price, self.category, escape_markdown(text=str(self.date), version=2))
+               .format(self.escape(self.description), self.escape(self.location),
+                       self.escape(str(self.price)), self.escape(self.category),
+                       self.escape(str(self.spent_at)))
+
+    def escape(self, text):
+        return escape_markdown(text, version=2)
 
     def __str__(self):
         return 'Expense: {self.description}, {self.location}, {self.price},' \
