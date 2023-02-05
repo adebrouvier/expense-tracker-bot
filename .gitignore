@@ -10,3 +10,6 @@ TheExpenseTrackerBot-*.json
 
 # Environment variables
 .env
+
+# Coverage
+.coverage
