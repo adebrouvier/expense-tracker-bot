@@ -8,6 +8,7 @@ pylint = "*"
 flake8 = "*"
 pytest = "*"
 pytest-cov = "*"
+mypy = "*"
 
 [packages]
 python-telegram-bot = "*"

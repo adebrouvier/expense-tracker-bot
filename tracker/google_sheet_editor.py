@@ -1,26 +1,18 @@
 import logging
 from datetime import date
-from pygsheets import authorize
 from pygsheets.cell import Cell
-from pygsheets.client import Client
 from pygsheets.worksheet import Worksheet
+from tracker.google_sheet_client import GoogleSheetClient
 
 
 class GoogleSheetEditor:
     EXPENSE_COLUMN = "C"
     TYPE_COLUMN = "F"
 
-    def __init__(self, spreadsheet, credentials_path: str):
+    def __init__(self, spreadsheet: str, client: GoogleSheetClient):
         self.logger = logging.getLogger(__name__)
         self.spreadsheet = spreadsheet
-        self.credentials_path = credentials_path
-        self.client = None
-
-    def authorize_with_file(self) -> Client:
-        self.client = authorize(service_account_file=self.credentials_path)
-
-    def authorize_with_env_variable(self, env_var: str) -> Client:
-        self.client = authorize(service_account_env_var=env_var)
+        self.client = client
 
     @staticmethod
     def get_worksheet_name(date) -> str:
@@ -39,7 +31,7 @@ class GoogleSheetEditor:
         )
         cell_list = worksheet.range(range_to_edit)[0]
         self.logger.debug("Processing values: {}".format(expense))
-        if self.row_empty(cell_list):
+        if self.is_row_empty(cell_list):
             worksheet.update_values(self.EXPENSE_COLUMN + str(row), [expense_values])
         else:
             expense_values.insert(0, "")
@@ -50,8 +42,8 @@ class GoogleSheetEditor:
     def end_column(self, expense_values):
         return chr(ord(self.EXPENSE_COLUMN) + len(expense_values) - 1)
 
-    def find_cell_by_date(self, worksheet: Worksheet, date) -> Cell:
-        return worksheet.find(self.formated_date(date))[0]
+    def find_cell_by_date(self, worksheet: Worksheet, cell_date: date) -> Cell:
+        return worksheet.find(self.formated_date(cell_date))[0]
 
     def get_cells(self, expense_date: date, worksheet: Worksheet) -> list:
         cell = self.find_cell_by_date(worksheet, expense_date)
@@ -68,11 +60,11 @@ class GoogleSheetEditor:
         return '{dt.day}-{dt.month}-{dt.year}'.format(dt=expense_date)
 
     @staticmethod
-    def cell_range(start, end):
+    def cell_range(start: str, end: str):
         return start + ":" + end
 
     @staticmethod
-    def row_empty(cell_list):
+    def is_row_empty(cell_list):
         for cell in cell_list:
             if cell.value != '':
                 return False

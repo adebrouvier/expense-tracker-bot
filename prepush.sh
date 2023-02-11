@@ -5,6 +5,10 @@ pipenv run flake8 --config=.flake8
 echo '-------------------'
 echo 'pylint'
 pipenv run pylint */*.py --disable=missing-docstring --errors-only
+# MyPy
+echo '-------------------'
+echo 'mypy'
+pipenv run mypy tracker
 # Tests
 echo '-------------------'
 echo 'tests'
