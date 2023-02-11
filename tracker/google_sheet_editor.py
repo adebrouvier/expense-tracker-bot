@@ -65,7 +65,6 @@ class GoogleSheetEditor:
 
     @staticmethod
     def formated_date(expense_date: date):
-        print(type(expense_date))
         return '{dt.day}-{dt.month}-{dt.year}'.format(dt=expense_date)
 
     @staticmethod
