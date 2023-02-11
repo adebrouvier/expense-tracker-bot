@@ -1,5 +1,5 @@
 from datetime import date
-from telegram.utils.helpers import escape_markdown
+from telegram.helpers import escape_markdown
 
 
 class Expense:
@@ -23,7 +23,7 @@ class Expense:
                        self.escape(str(self.price)), self.escape(self.category),
                        self.escape(str(self.spent_at)))
 
-    def escape(self, text):
+    def escape(self, text: str):
         return escape_markdown(text, version=2)
 
     def __str__(self):

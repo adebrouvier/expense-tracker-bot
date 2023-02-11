@@ -23,7 +23,7 @@ class ExpenseTracker:
         )
         return [row[0] for row in categories_matrix]  # Extract column from matrix
 
-    def last_expenses(self, number):
+    def last_expenses(self, number: int):
         current_date = date.today()
         worksheet_title = self.editor.get_worksheet_name(current_date)
         worksheet = self.editor.open_worksheet(worksheet_title)

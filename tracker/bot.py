@@ -1,15 +1,16 @@
 import logging
 from datetime import date
 from datetime import datetime
-from telegram import ParseMode
-from telegram import ReplyKeyboardMarkup
-from telegram import ReplyKeyboardRemove
-from telegram import Update
-from telegram.ext import CommandHandler
-from telegram.ext import ConversationHandler
-from telegram.ext import Filters
-from telegram.ext import MessageHandler
-from telegram.ext import Updater
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram.constants import ParseMode
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    ContextTypes,
+    ConversationHandler,
+    MessageHandler,
+    filters
+)
 from sentry_sdk import capture_exception
 from pygsheets.spreadsheet import WorksheetNotFound
 from pygsheets.exceptions import SpreadsheetNotFound
@@ -18,15 +19,16 @@ import sentry_sdk
 from tracker.expense import Expense
 from tracker.expense_tracker import ExpenseTracker
 from tracker.config import Config
+from tracker.google_sheet_client import GoogleSheetClient
 from tracker.google_sheet_editor import GoogleSheetEditor
 
 
-def start(update: Update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id,
-                             text="Hi! I'm the expense tracker bot")
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text="Hi! I'm the expense tracker bot")
 
 
-def add(update: Update, context):
+async def add(update: Update, context: ContextTypes.DEFAULT_TYPE):
     raw_date = " ".join(context.args)
 
     if not raw_date.strip():
@@ -36,41 +38,41 @@ def add(update: Update, context):
             parsed_date = datetime.strptime(raw_date, '%d/%m/%Y')
             context.user_data['expense_date'] = parsed_date
         except ValueError:
-            update.message.reply_text("Invalid date provided. Expected format: dd/mm/yyyy")
+            await update.message.reply_text("Invalid date provided. Expected format: dd/mm/yyyy")
             return ConversationHandler.END
 
-    reply_message(update, 'Please send a *description*\\.', ReplyKeyboardRemove())
+    await reply_message(update, 'Please send a *description*\\.', ReplyKeyboardRemove())
     return DESCRIPTION
 
 
-def description(update: Update, context):
+async def description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
     context.user_data['description'] = text
     logger.info("The description is %s", context.user_data['description'])
-    reply_message(update, 'Please send the *location*\\.', ReplyKeyboardRemove())
+    await reply_message(update, 'Please send the *location*\\.', ReplyKeyboardRemove())
     return LOCATION
 
 
-def location(update: Update, context):
+async def location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
     context.user_data['location'] = text
     logger.info("Location of expense: %s", update.message.text)
-    reply_message(update, 'Please send the *price*\\.', ReplyKeyboardRemove())
+    await reply_message(update, 'Please send the *price*\\.', ReplyKeyboardRemove())
     return PRICE
 
 
-def price(update: Update, context):
+async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
     context.user_data['price'] = int(text)
     logger.info("Price of expense: %s", update.message.text)
 
     category_keyboard = [x.tolist() for x in np.array_split(expense_tracker.get_categories(), 3)]
-    reply_message(update, 'Please send the *category*\\.',
-                  ReplyKeyboardMarkup(category_keyboard, one_time_keyboard=True))
+    await reply_message(update, 'Please send the *category*\\.',
+                        ReplyKeyboardMarkup(category_keyboard, one_time_keyboard=True))
     return CATEGORY
 
 
-def category(update: Update, context):
+async def category(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
     logger.info("Category of expense: %s", update.message.text)
     context.user_data['category'] = text
@@ -78,32 +80,32 @@ def category(update: Update, context):
     expense = create_expense(context.user_data)
     try:
         expense_tracker.add_expense(expense)
-        update.message.reply_text('Expense added ✅\n{}'.format(expense.to_markdown()),
-                                  parse_mode=ParseMode.MARKDOWN_V2)
+        await reply_message(update, 'Expense added ✅\n{}'.format(expense.to_markdown()))
     except SpreadsheetNotFound:
-        update.message.reply_text('Spreadsheet not found. Please update config variable.')
+        await update.message.reply_text('Spreadsheet not found. Please update config variable.')
     except WorksheetNotFound:
         msg = 'Worksheet not found. Check if spreadsheet has worksheet for current month and year.'
-        update.message.reply_text(msg)
+        await update.message.reply_text(msg)
     except Exception as error:  # pylint: disable=broad-except
-        update.message.reply_text('There was an error while adding the expense.')
+        await update.message.reply_text('There was an error while adding the expense.')
         logger.error(error)
         capture_exception(error)
 
     return ConversationHandler.END
 
 
-def cancel(update: Update, _context):
-    user = update.message.from_user
-    logger.info("User %s canceled the conversation.", user.first_name)
-    reply_message(update, 'Expense canceled', reply_markup=ReplyKeyboardRemove())
+async def cancel(update: Update, _context: ContextTypes.DEFAULT_TYPE):
+    if update.message and update.message.from_user:
+        user_name = update.message.from_user
+    logger.info("User %s canceled the conversation.", user_name)
+    await reply_message(update, 'Expense canceled', reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
 
-def last_expenses(update: Update, _context):
+async def last_expenses(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     number_of_expenses = 5
     last_expenses = expense_tracker.last_expenses(number_of_expenses)
-    reply_message(update, 'Last {} expenses\n{}'.format(number_of_expenses, '\n\n'.join(last_expenses)))
+    await reply_message(update, 'Last {} expenses\n{}'.format(number_of_expenses, '\n\n'.join(last_expenses)))
     return ConversationHandler.END
 
 
@@ -113,10 +115,10 @@ def create_expense(user_data) -> Expense:
     return expense
 
 
-def reply_message(update: Update, text, reply_markup=None):
-    update.message.reply_text(text,
-                              parse_mode=ParseMode.MARKDOWN_V2,
-                              reply_markup=reply_markup)
+async def reply_message(update: Update, text: str, reply_markup=None):
+    await update.message.reply_text(text,
+                                    parse_mode=ParseMode.MARKDOWN_V2,
+                                    reply_markup=reply_markup)
 
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -133,51 +135,51 @@ sentry_sdk.init(
     environment='production' if not config.development else 'development',
 )
 
-editor = GoogleSheetEditor(config.spreadsheet_name, config.sheets_oauth)
+client = GoogleSheetClient(config.sheets_oauth, 'GDRIVE_API_CREDENTIALS')
 if config.development:
-    editor.authorize_with_file()
+    client.authorize_with_file()
 else:
-    editor.authorize_with_env_variable('GDRIVE_API_CREDENTIALS')
+    client.authorize_with_env_variable()
+
+editor = GoogleSheetEditor(config.spreadsheet_name, client)
 expense_tracker = ExpenseTracker(editor)
 
 
-def main():
+def main() -> None:
     logger.info("Starting bot...")
-    updater = Updater(token=config.bot_token, use_context=True)
-    dispatcher = updater.dispatcher
-    start_handler = CommandHandler('start', start, Filters.user(user_id=config.user_id))
-    dispatcher.add_handler(start_handler)
-    dispatcher.add_handler(conversation_handler())
+    application = ApplicationBuilder().token(config.bot_token).build()
+    start_handler = CommandHandler('start', start, filters.User(user_id=config.user_id))
+    application.add_handler(start_handler)
+    application.add_handler(conversation_handler())
+
     if config.development:
         logger.info("Starting in development mode")
-        updater.start_polling()
+        application.run_polling()
     else:
         logger.info("Starting in production mode")
         webhook_url = "{}/{}".format(config.app_url, config.bot_token)
-        updater.start_webhook(listen="0.0.0.0",
-                              port=config.port,
-                              url_path=config.bot_token,
-                              webhook_url=webhook_url)
+        application.run_webhook(listen="0.0.0.0",
+                                port=config.port,
+                                url_path=config.bot_token,
+                                webhook_url=webhook_url)
         logger.info("Started webhook in app %s", config.app_url)
-        updater.idle()
-    logger.info("Bot started.")
 
 
 def conversation_handler():
     return ConversationHandler(
         entry_points=[
-            CommandHandler('add', add, Filters.user(user_id=config.user_id)),
-            CommandHandler('last', last_expenses, Filters.user(user_id=config.user_id))
+            CommandHandler('add', add, filters.User(user_id=config.user_id)),
+            CommandHandler('last', last_expenses, filters.User(user_id=config.user_id))
         ],
 
         states={
-            DESCRIPTION: [MessageHandler(Filters.text, description)],
+            DESCRIPTION: [MessageHandler(filters.TEXT, description)],
 
-            LOCATION: [MessageHandler(Filters.text, location)],
+            LOCATION: [MessageHandler(filters.TEXT, location)],
 
-            PRICE: [MessageHandler(Filters.regex(price_regex()), price)],
+            PRICE: [MessageHandler(filters.Regex(price_regex()), price)],
 
-            CATEGORY: [MessageHandler(Filters.regex(categories_regex(expense_tracker)), category)]
+            CATEGORY: [MessageHandler(filters.Regex(categories_regex(expense_tracker)), category)]
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
