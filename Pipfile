@@ -11,7 +11,7 @@ pytest-cov = "*"
 mypy = "*"
 
 [packages]
-python-telegram-bot = "*"
+python-telegram-bot = {version = "*", extras = ["webhooks"]}
 google-auth-oauthlib = "*"
 numpy = "*"
 python-dotenv = "*"
