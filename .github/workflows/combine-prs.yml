@@ -10,4 +10,4 @@ jobs:
     steps:
       - name: combine-prs
         id: combine-prs
-        uses: github/combine-prs@v3
+        uses: github/combine-prs@v3.0.0
