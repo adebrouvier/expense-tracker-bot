@@ -17,4 +17,6 @@ class GoogleSheetClient:
         self.client = authorize(service_account_env_var=self.service_account_env_var)
 
     def open(self, spreadsheet: str) -> Spreadsheet:
+        if not self.client:
+            raise Exception('Client must be authorized before calling open')
         return self.client.open(spreadsheet)
