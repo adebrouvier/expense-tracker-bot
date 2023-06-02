@@ -1,6 +1,7 @@
 from datetime import date
 from tracker.expense import Expense
 from tracker.google_sheet_editor import GoogleSheetEditor
+from pygsheets.spreadsheet import WorksheetNotFound
 
 
 class ExpenseTracker:
@@ -8,10 +9,14 @@ class ExpenseTracker:
     def __init__(self, editor: GoogleSheetEditor):
         self.editor = editor
 
-    def add_expense(self, expense):
+    def add_expense(self, expense: Expense):
         worksheet_title = self.editor.get_worksheet_name(expense.spent_at)
-        worksheet = self.editor.open_worksheet(worksheet_title)
-        self.editor.add_expense(worksheet, expense)
+        try:
+            worksheet = self.editor.open_worksheet(worksheet_title)
+            self.editor.add_expense(worksheet, expense)
+        except WorksheetNotFound:
+            msg = 'Worksheet {} for expense with date {} not found in spreadsheet.'.format(worksheet_title, str(expense.spent_at))
+            raise WorksheetNotFound(msg)
 
     def get_categories(self):
         worksheet = self.editor.open_worksheet('non-fixed categories')
