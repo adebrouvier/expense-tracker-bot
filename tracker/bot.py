@@ -83,9 +83,8 @@ async def category(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await reply_message(update, 'Expense added ✅\n{}'.format(expense.to_markdown()))
     except SpreadsheetNotFound:
         await update.message.reply_text('Spreadsheet not found. Please update config variable.')
-    except WorksheetNotFound:
-        msg = 'Worksheet not found. Check if spreadsheet has worksheet for current month and year.'
-        await update.message.reply_text(msg)
+    except WorksheetNotFound as error:
+        await update.message.reply_text(str(error))
     except Exception as error:  # pylint: disable=broad-except
         await update.message.reply_text('There was an error while adding the expense.')
         logger.error(error)
