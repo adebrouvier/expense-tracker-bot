@@ -345,11 +345,11 @@
                 "webhooks"
             ],
             "hashes": [
-                "sha256:1185edee387db7b08027e87b67fa9a3cc3263ae5ab5bb55513acd1bca5c3cf4b",
-                "sha256:73e46a534be9d1c790ce8b494765cca18a5c2f3f5b4932d83bcb06bb0051eb4a"
+                "sha256:2f45a94c861cbd40440ece2be176ef0fc69e10d84e6dfa17f9a456e32aeece13",
+                "sha256:fc9605a855794231c802cc3948e6f7c319a817b5cd1827371f170bc7ca0ca279"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==20.3"
+            "markers": "python_version >= '3.8'",
+            "version": "==20.5"
         },
         "requests": {
             "hashes": [
