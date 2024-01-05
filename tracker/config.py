@@ -8,6 +8,7 @@ class Config:
         load_dotenv()
         self.bot_token = os.getenv("BOT_TOKEN")
         self.spreadsheet_name = os.getenv("SPREADSHEET_NAME")
+        self.spreadsheet_name_suffix = os.getenv("SPREADSHEET_NAME_SUFFIX")
         self.sheets_oauth = os.getenv("SHEETS_OAUTH")
         self.user_id = int(os.getenv("USER_ID"))
         self.development = os.getenv("DEVELOPMENT", True) == 'True'

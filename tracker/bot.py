@@ -119,6 +119,9 @@ async def reply_message(update: Update, text: str, reply_markup=None):
                                     parse_mode=ParseMode.MARKDOWN_V2,
                                     reply_markup=reply_markup)
 
+def get_spreadsheet_name_with_suffix(spreadsheet_name_suffix: str) -> str:
+    current_year = date.today().year
+    return f"{str(current_year)} {spreadsheet_name_suffix}"
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -140,7 +143,12 @@ if config.development:
 else:
     client.authorize_with_env_variable()
 
-editor = GoogleSheetEditor(config.spreadsheet_name, client)
+if config.spreadsheet_name_suffix:
+    spreadsheet_name = get_spreadsheet_name_with_suffix(config.spreadsheet_name_suffix)
+else:
+    spreadsheet_name = config.spreadsheet_name
+
+editor = GoogleSheetEditor(spreadsheet_name, client)
 expense_tracker = ExpenseTracker(editor)
 
 
