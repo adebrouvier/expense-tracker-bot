@@ -377,11 +377,11 @@
         },
         "sentry-sdk": {
             "hashes": [
-                "sha256:1cce906dc86afda1ecd22c4716b0c846639151a3c3b59e23826711c6525c5642",
-                "sha256:816aeb900a54bba2d9346bad8ffac2d258c4fa09271b95a6533a714e9000f074"
+                "sha256:320a55cdf9da9097a0bead239c35b7e61f53660ef9878861824fd6d9b2eaf3b5",
+                "sha256:81b5b9ffdd1a374e9eb0c053b5d2012155db9cbe76393a8585677b753bd5fdc1"
             ],
             "index": "pypi",
-            "version": "==1.33.1"
+            "version": "==1.39.1"
         },
         "sniffio": {
             "hashes": [
