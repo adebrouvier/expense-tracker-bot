@@ -14,11 +14,31 @@ class TestExpenseTracker():
         assert expense_tracker.last_expenses(1) == []
 
     @patch('tracker.google_sheet_editor.GoogleSheetEditor.get_cells')
-    def test_last_expenses(self, get_cells_mock):
+    def test_last_expenses_as_markdown(self, get_cells_mock):
         get_cells_mock.return_value = [['22-1-2020', 'Friday', 'Burger', 'OutNIn', '10', 'Food'],
                                        ['23-1-2020', 'Saturday', 'Burger', 'OutNIn', '10', 'Food']]
         editor = MagicMock(spec=GoogleSheetEditor, get_cells=get_cells_mock)
         expense_tracker = ExpenseTracker(editor=editor)
-        assert expense_tracker.last_expenses(1) == ['❗ *Description*: Burger\n' \
+        assert expense_tracker.last_expenses_as_markdown(1) == ['❗ *Description*: Burger\n' \
                + '📍 *Location*: OutNIn\n💰 *Price*: $10\n🏷 *Category*: Food\n' \
                + '📅 *Date*: 23\\-1\\-2020']
+
+    @patch('tracker.google_sheet_editor.GoogleSheetEditor.get_cells')
+    def test_last_expenses_with_no_argument(self, get_cells_mock):
+        get_cells_mock.return_value = [['22-1-2020', 'Friday', 'Burger', 'OutNIn', '10', 'Food'],
+                                       ['23-1-2020', 'Saturday', 'Burger', 'OutNIn', '10', 'Food']]
+        editor = MagicMock(spec=GoogleSheetEditor, get_cells=get_cells_mock)
+        expense_tracker = ExpenseTracker(editor=editor)
+        assert expense_tracker.last_expenses_as_markdown() == ['❗ *Description*: Burger\n' \
+               + '📍 *Location*: OutNIn\n💰 *Price*: $10\n🏷 *Category*: Food\n' \
+               + '📅 *Date*: 22\\-1\\-2020',
+               '❗ *Description*: Burger\n📍 *Location*: OutNIn\n💰 *Price*: $10\n' \
+               + '🏷 *Category*: Food\n📅 *Date*: 23\\-1\\-2020']
+
+    @patch('tracker.google_sheet_editor.GoogleSheetEditor.get_cells')
+    def test_total_expenses(self, get_cells_mock):
+        get_cells_mock.return_value = [['22-1-2020', 'Friday', 'Burger', 'OutNIn', '10', 'Food'],
+                                       ['23-1-2020', 'Saturday', 'Burger', 'OutNIn', '15', 'Food']]
+        editor = MagicMock(spec=GoogleSheetEditor, get_cells=get_cells_mock)
+        expense_tracker = ExpenseTracker(editor=editor)
+        assert expense_tracker.total_expenses() == 25

@@ -103,8 +103,13 @@ async def cancel(update: Update, _context: ContextTypes.DEFAULT_TYPE):
 
 async def last_expenses(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     number_of_expenses = 5
-    last_expenses = expense_tracker.last_expenses(number_of_expenses)
+    last_expenses = expense_tracker.last_expenses_as_markdown(number_of_expenses)
     await reply_message(update, 'Last {} expenses\n{}'.format(number_of_expenses, '\n\n'.join(last_expenses)))
+    return ConversationHandler.END
+
+async def total_expenses(update: Update, _context: ContextTypes.DEFAULT_TYPE):
+    total_expenses = expense_tracker.total_expenses()
+    await reply_message(update, 'Total {} expenses: ${}'.format(total_expenses, total_expenses))
     return ConversationHandler.END
 
 
@@ -176,7 +181,8 @@ def conversation_handler():
     return ConversationHandler(
         entry_points=[
             CommandHandler('add', add, filters.User(user_id=config.user_id)),
-            CommandHandler('last', last_expenses, filters.User(user_id=config.user_id))
+            CommandHandler('last', last_expenses, filters.User(user_id=config.user_id)),
+            CommandHandler('total', total_expenses, filters.User(user_id=config.user_id))
         ],
 
         states={
