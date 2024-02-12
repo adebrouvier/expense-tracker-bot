@@ -15,4 +15,3 @@ class Config:
         self.port = int(os.getenv("PORT", "8443"))
         self.app_url = os.getenv("APP_URL")
         self.sentry_dsn = os.getenv("SENTRY_DSN")
-        self.locale = os.getenv("LOCALE", "en_US.UTF-8")

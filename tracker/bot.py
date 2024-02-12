@@ -1,4 +1,3 @@
-import locale
 import logging
 from datetime import date
 from datetime import datetime
@@ -110,7 +109,7 @@ async def last_expenses(update: Update, _context: ContextTypes.DEFAULT_TYPE):
 
 async def total_expenses(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     total_expenses = expense_tracker.total_expenses()
-    await reply_message(update, 'Total expenses: {}'.format(locale.currency(total_expenses, grouping=True)))
+    await reply_message(update, 'Total expenses: ${}'.format(total_expenses))
     return ConversationHandler.END
 
 
@@ -142,8 +141,6 @@ sentry_sdk.init(
     traces_sample_rate=1.0,
     environment='production' if not config.development else 'development',
 )
-
-locale.setlocale(locale.LC_ALL, config.locale)
 
 client = GoogleSheetClient(config.sheets_oauth, 'GDRIVE_API_CREDENTIALS')
 if config.development:
