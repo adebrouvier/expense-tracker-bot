@@ -46,6 +46,7 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
 ignore_missing_imports = true
+ignore-paths = [".venv"]
 
 [tool.pylint]
 max-line-length = 100
@@ -53,8 +54,10 @@ disable = [
     "C0111",  # missing-docstring
     "R0903",  # too-few-public-methods
 ]
+ignore-paths = [".venv"]
 
 [tool.flake8]
 max-line-length = 100
 extend-ignore = ["E203", "W503"]
+ignore-paths = [".venv"]
 
