@@ -7,7 +7,7 @@ name = "expense-tracker-bot"
 version = "0.1.0"
 description = "A Telegram bot for tracking expenses with Google Sheets."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license =  "MIT"
 authors = [
     {name = "adebrouvier"},
