@@ -1,2 +1,2 @@
-web: python3 -m tracker.bot
-worker: python3 -m tracker.bot
+web: python -m tracker.bot
+worker: python -m tracker.bot

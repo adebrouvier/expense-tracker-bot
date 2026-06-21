@@ -15,21 +15,21 @@ authors = [
 keywords = ["telegram", "bot", "expenses", "google-sheets"]
 
 dependencies = [
-    "python-telegram-bot[webhooks]==21.4",
-    "google-auth-oauthlib==1.2.1",
-    "numpy==1.26.0",
-    "python-dotenv==1.0.1",
-    "pygsheets==2.0.6",
-    "sentry-sdk==2.12.0",
+    "python-telegram-bot[webhooks]",
+    "google-auth-oauthlib",
+    "numpy",
+    "python-dotenv",
+    "pygsheets",
+    "sentry-sdk",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "pylint==3.1.0",
-    "flake8==7.0.0",
-    "pytest==8.1.1",
-    "pytest-cov==5.0.0",
-    "mypy==1.9.0",
+    "pylint",
+    "flake8",
+    "pytest",
+    "pytest-cov",
+    "mypy",
 ]
 
 #[tool.setuptools]
