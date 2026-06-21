@@ -13,3 +13,6 @@ TheExpenseTrackerBot-*.json
 
 # Coverage
 .coverage
+
+# pyproject
+*.egg-info/
