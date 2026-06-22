@@ -94,6 +94,7 @@ async def category(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def cancel(update: Update, _context: ContextTypes.DEFAULT_TYPE):
+    user_name = ''
     if update.message and update.message.from_user:
         user_name = update.message.from_user
     logger.info("User %s canceled the conversation.", user_name)
