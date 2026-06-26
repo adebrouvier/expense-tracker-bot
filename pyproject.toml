@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "expense-tracker-bot"
+version = "0.1.0"
+description = "A Telegram bot for tracking expenses with Google Sheets."
+readme = "README.md"
+requires-python = ">=3.12"
+license =  "MIT"
+authors = [
+    {name = "adebrouvier"},
+]
+keywords = ["telegram", "bot", "expenses", "google-sheets"]
+
+dependencies = [
+    "python-telegram-bot[webhooks]",
+    "google-auth-oauthlib",
+    "numpy",
+    "python-dotenv",
+    "pygsheets",
+    "sentry-sdk",
+]
+
+[dependency-groups]
+dev = [
+    "pylint",
+    "flake8",
+    "pytest",
+    "pytest-cov",
+    "mypy",
+]
+
+#[tool.setuptools]
+#packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "--cov=src --cov-report=html --cov-report=term-missing"
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+exclude = [".venv"]
+
+[tool.pylint]
+max-line-length = 100
+disable = [
+    "C0111",  # missing-docstring
+    "R0903",  # too-few-public-methods
+]
+ignore-paths = [".venv"]
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203", "W503"]
+exclude = [".venv"]
+
