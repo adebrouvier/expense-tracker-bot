@@ -107,8 +107,10 @@ async def cancel(update: Update, _context: ContextTypes.DEFAULT_TYPE):
 async def last_expenses(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     number_of_expenses = 5
     last_expenses = expense_tracker.last_expenses_as_markdown(number_of_expenses)
-    await reply_message(update, 'Last {} expenses\n{}'.format(number_of_expenses, '\n\n'.join(last_expenses)))
+    message = 'Last {} expenses\n{}'.format(number_of_expenses, '\n\n'.join(last_expenses))
+    await reply_message(update, message)
     return ConversationHandler.END
+
 
 async def total_expenses(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     total_expenses = expense_tracker.total_expenses()
@@ -127,9 +129,11 @@ async def reply_message(update: Update, text: str, reply_markup=None):
                                     parse_mode=ParseMode.MARKDOWN_V2,
                                     reply_markup=reply_markup)
 
+
 def get_spreadsheet_name_with_suffix(spreadsheet_name_suffix: str) -> str:
     current_year = date.today().year
     return f"{str(current_year)} {spreadsheet_name_suffix}"
+
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)

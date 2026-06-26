@@ -15,7 +15,10 @@ class ExpenseTracker:
             worksheet = self.editor.open_worksheet(worksheet_title)
             self.editor.add_expense(worksheet, expense)
         except WorksheetNotFound:
-            msg = 'Worksheet {} for expense with date {} not found in spreadsheet.'.format(worksheet_title, str(expense.spent_at))
+            msg = (
+                f'Worksheet {worksheet_title} for expense with date {expense.spent_at} '
+                'not found in spreadsheet.'
+            )
             raise WorksheetNotFound(msg)
 
     def get_categories(self):

@@ -18,10 +18,19 @@ class Expense:
         return [self.description, self.location, self.price, self.category]
 
     def to_markdown(self):
-        return '❗ *Description*: {}\n📍 *Location*: {}\n💰 *Price*: ${}\n🏷 *Category*: {}\n📅 *Date*: {}' \
-               .format(self.escape(self.description), self.escape(self.location),
-                       self.escape(str(self.price)), self.escape(self.category),
-                       self.escape(str(self.spent_at)))
+        return (
+            '❗ *Description*: {}\n'
+            '📍 *Location*: {}\n'
+            '💰 *Price*: ${}\n'
+            '🏷 *Category*: {}\n'
+            '📅 *Date*: {}'
+        ).format(
+            self.escape(self.description),
+            self.escape(self.location),
+            self.escape(str(self.price)),
+            self.escape(self.category),
+            self.escape(str(self.spent_at))
+        )
 
     def escape(self, text: str):
         return escape_markdown(text, version=2)
