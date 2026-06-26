@@ -85,6 +85,8 @@ async def category(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text('Spreadsheet not found. Please update config variable.')
     except WorksheetNotFound as error:
         await update.message.reply_text(str(error))
+    except ValueError as error:
+        await update.message.reply_text(str(error))
     except Exception as error:  # pylint: disable=broad-except
         await update.message.reply_text('There was an error while adding the expense.')
         logger.error(error)
