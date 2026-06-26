@@ -1,4 +1,3 @@
-name=Dockerfile url=https://github.com/adebrouvier/expense-tracker-bot/blob/migrate-to-uv/Dockerfile
 # Build stage
 FROM python:3.12-slim as builder
 
