@@ -43,7 +43,10 @@ class GoogleSheetEditor:
         return chr(ord(self.EXPENSE_COLUMN) + len(expense_values) - 1)
 
     def find_cell_by_date(self, worksheet: Worksheet, cell_date: date) -> Cell:
-        return worksheet.find(self.formated_date(cell_date))[0]
+        cells = worksheet.find(self.formated_date(cell_date))
+        if not cells:
+            raise ValueError("No cell found for date: {}".format(cell_date))
+        return cells[0]
 
     def get_cells(self, expense_date: date, worksheet: Worksheet) -> list:
         cell = self.find_cell_by_date(worksheet, expense_date)
